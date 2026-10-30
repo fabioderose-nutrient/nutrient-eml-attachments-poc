@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <meta charset="utf-8" />
+    <title>DocuVieware email attachments</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <script>
+        var CONTROL_ID = "DocuVieware1";
+
+        // A new session for every page load, so a reload starts with an empty viewer.
+        function generateGuid() {
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0;
+                var v = c === "x" ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        $(document).ready(function () {
+            var docuViewareConfig = {
+                SessionId: generateGuid(),
+                ControlId: CONTROL_ID,
+                // Set to true to show the TWAIN scan button (DocuVieware TWAIN service, Windows only).
+                EnableTwainAcquisitionButton: false
+            };
+            $.ajax({
+                url: "/api/DocuVieware/GetDocuViewareControl",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(docuViewareConfig),
+                success: function (data) {
+                    if (data && data.htmlContent) {
+                        $("#dvContainer").html(data.htmlContent);
+                        waitForDocuViewareReady();
+                    } else {
+                        console.error("No control markup in the response:", data);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("GetDocuViewareControl failed:", status, error, xhr.responseText);
+                }
+            });
+        });
+
+        function waitForDocuViewareReady() {
+            if (typeof DocuViewareAPI !== "undefined" && DocuViewareAPI.IsInitialized(CONTROL_ID)) {
+                registerAttachmentsSnapIn();
+                DocuViewareAPI.RegisterOnNewDocumentLoaded(CONTROL_ID, refreshAttachments);
+                DocuViewareAPI.RegisterOnPageDeleted(CONTROL_ID, scheduleDeleteButtonCheck);
+                scheduleDeleteButtonCheck();
+                observeThumbnailMenu();
+                setInterval(ensureInlineDeleteButton, 1000);
+            } else {
+                setTimeout(waitForDocuViewareReady, 50);
+            }
+        }
+
+        // =====================================================================
+        //  Attachments snap-in: lists the files embedded in the loaded document
+        //  (email attachments, PDF embedded files) and downloads them.
+        // =====================================================================
+        var attachmentsPanel = null;
+
+        function registerAttachmentsSnapIn() {
+            var icon = document.createElement("svg");
+            icon.setAttribute("viewBox", "0 0 24 24");
+            icon.setAttribute("height", "100%");
+            icon.setAttribute("width", "100%");
+            icon.innerHTML = "<path d='M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6h-1.5z'></path>";
+
+            attachmentsPanel = document.createElement("div");
+            attachmentsPanel.id = "attachments-snap-in-panel";
+            attachmentsPanel.style.padding = "10px";
+            attachmentsPanel.innerHTML = "<p style='margin:0;color:#888'>Load a document to see its attachments.</p>";
+
+            DocuViewareAPI.AddCustomSnapIn(CONTROL_ID, "attachments", "Attachments", icon, attachmentsPanel, true, function () {});
+        }
+
+        function updateAttachmentsPanel(html) {
+            var target = document.getElementById("attachments-snap-in-panel") || attachmentsPanel;
+            if (target) { target.innerHTML = html; }
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/[&<>"']/g, function (c) {
+                return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c];
+            });
+        }
+
+        function refreshAttachments() {
+            updateAttachmentsPanel("<p style='margin:0;color:#888'>Reading attachments...</p>");
+            DocuViewareAPI.PostCustomServerAction(CONTROL_ID, true, "GetAttachmentsForLoadedDocument", null, function (response) {
+                var raw = (response && response.result !== undefined) ? response.result : response;
+                var attachments = [];
+                if (typeof raw === "string" && raw.length > 0) {
+                    try { attachments = JSON.parse(raw); } catch (err) { attachments = []; }
+                } else if (Array.isArray(raw)) {
+                    attachments = raw;
+                }
+
+                if (attachments.length > 0) {
+                    var html = "<p style='margin:0 0 8px;color:#555'>" + attachments.length + " attachment(s). Click to download.</p>" +
+                        "<ul style='margin:0;padding:0;list-style:none'>";
+                    attachments.forEach(function (name, index) {
+                        html += "<li style='padding:4px 0'>" +
+                            "<a href='#' class='attachment-link' style='text-decoration:none;color:#1a73e8' " +
+                            "onclick='downloadAttachment(" + index + "); return false;'>&#128206; " + escapeHtml(name) + "</a>" +
+                            "</li>";
+                    });
+                    html += "</ul>";
+                    updateAttachmentsPanel(html);
+                } else {
+                    updateAttachmentsPanel("<p style='margin:0;color:#888'>No attachments found.</p>");
+                }
+            });
+        }
+
+        function downloadAttachment(index) {
+            DocuViewareAPI.PostCustomServerAction(CONTROL_ID, true, "DownloadAttachment_" + index, null, function (response) {
+                var raw = (response && response.result !== undefined) ? response.result : response;
+                var parsed = null;
+                try { parsed = (typeof raw === "string") ? JSON.parse(raw) : raw; } catch (e) { console.error("Parse error:", e); return; }
+                if (!parsed || parsed.success === false) { console.error("DownloadAttachment failed:", parsed && parsed.error); return; }
+
+                var bytes = atob(parsed.base64);
+                var byteArray = new Uint8Array(bytes.length);
+                for (var i = 0; i < bytes.length; i++) { byteArray[i] = bytes.charCodeAt(i); }
+
+                var url = URL.createObjectURL(new Blob([byteArray]));
+                var a = document.createElement("a");
+                a.href = url;
+                a.download = parsed.fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // =====================================================================
+        //  "Load and merge" toolbar button: one file is opened as is; several
+        //  files (or a file added to an open document) are merged into one PDF.
+        // =====================================================================
+        function multiloading() {
+            var fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.multiple = true;
+            fileInput.accept = ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.eml,.msg,.txt,.jpg,.jpeg,.png,.tif,.tiff";
+
+            fileInput.onchange = async function (e) {
+                var files = e.target.files;
+                if (files.length === 0) { return; }
+                try {
+                    var documents = [];
+                    for (var i = 0; i < files.length; i++) {
+                        documents.push({
+                            fileName: files[i].name,
+                            fileType: files[i].type,
+                            fileSize: files[i].size,
+                            data: await fileToBase64(files[i])
+                        });
+                    }
+                    var hasDocument = DocuViewareAPI.GetPageCount(CONTROL_ID) > 0;
+
+                    if (documents.length === 1 && !hasDocument) {
+                        window.__dvMerged = false;
+                        DocuViewareAPI.PostCustomServerAction(CONTROL_ID, false, "LoadSingleFile", JSON.stringify(documents[0]));
+                    } else {
+                        window.__dvMerged = true;
+                        DocuViewareAPI.PostCustomServerAction(CONTROL_ID, false, "MergeDocuments", JSON.stringify(documents));
+                    }
+                } catch (error) {
+                    console.error("Error reading files:", error);
+                    alert("Error loading documents");
+                }
+            };
+            fileInput.click();
+        }
+
+        // Reads a File as base64 (without the "data:...;base64," prefix).
+        function fileToBase64(file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () { resolve(reader.result.split(",")[1]); };
+                reader.onerror = reject;
+            });
+        }
+
+        // =====================================================================
+        //  "Save on server" toolbar button
+        // =====================================================================
+        function getLoadedDocumentFileName() {
+            if (typeof DocuViewareAPI === "undefined") { return null; }
+            if (typeof DocuViewareAPI.GetDocumentName === "function") {
+                return DocuViewareAPI.GetDocumentName(CONTROL_ID);
+            }
+            return null;
+        }
+
+        function customsave() {
+            var payload = {
+                fileName: getLoadedDocumentFileName(),
+                isMerged: window.__dvMerged === true
+            };
+            DocuViewareAPI.PostCustomServerAction(CONTROL_ID, false, "CustomSave", JSON.stringify(payload), function (result) {
+                try {
+                    var parsed = typeof result === "string" ? JSON.parse(result) : result;
+                    if (parsed && parsed.url) { alert("Document saved to: " + parsed.url); }
+                } catch (e) {
+                    console.warn("CustomSave response parse error:", e);
+                }
+            });
+        }
+
+        // =====================================================================
+        //  Delete the last page: DocuVieware does not delete the only page of a
+        //  document, so a delete entry (thumbnail menu) and a "Close document"
+        //  button close the document instead.
+        // =====================================================================
+        function ensureDeleteButton() {
+            if (typeof DocuViewareAPI === "undefined" || !DocuViewareAPI.IsInitialized(CONTROL_ID)) { return; }
+            if (DocuViewareAPI.GetPageCount(CONTROL_ID) !== 1) { return; }
+
+            var thumbnailMenu = $(".dv-thumbnail-menu .menu.dv-list-group");
+            if (!thumbnailMenu.length) { return; }
+            if (thumbnailMenu.find('button:has(svg path[d*="M6 19c0 1.1"])').length > 0) { return; }
+
+            var deleteButton = $('<button class="dv-list-group-item" type="button" style="background: rgb(255, 255, 255);">' +
+                '<span class="context-menu-icon" style="fill: rgb(115, 115, 115);">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
+                '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>' +
+                '</svg>' +
+                '</span>' +
+                '</button>');
+            deleteButton.on("click", function () { DocuViewareAPI.CloseDocument(CONTROL_ID); });
+            thumbnailMenu.append(deleteButton);
+        }
+
+        function ensureInlineDeleteButton() {
+            var buttonId = "dv-delete-single-page";
+            var button = document.getElementById(buttonId);
+            if (!button) {
+                button = document.createElement("button");
+                button.id = buttonId;
+                button.type = "button";
+                button.textContent = "Close document";
+                button.style.cssText = "position:absolute;bottom:16px;left:16px;z-index:9999;padding:8px 12px;" +
+                    "background:#fff;border:1px solid #d0d0d0;border-radius:4px;cursor:pointer;display:none";
+                button.addEventListener("click", function () { DocuViewareAPI.CloseDocument(CONTROL_ID); });
+                document.body.appendChild(button);
+            }
+            if (typeof DocuViewareAPI === "undefined" || !DocuViewareAPI.IsInitialized(CONTROL_ID)) {
+                button.style.display = "none";
+                return;
+            }
+            button.style.display = DocuViewareAPI.GetPageCount(CONTROL_ID) === 1 ? "block" : "none";
+        }
+
+        function observeThumbnailMenu() {
+            if (window.__dvDeleteObserver) { return; }
+            window.__dvDeleteObserver = new MutationObserver(ensureDeleteButton);
+            window.__dvDeleteObserver.observe(document.body, { childList: true, subtree: true });
+        }
+
+        function scheduleDeleteButtonCheck() {
+            [150, 500, 1000].forEach(function (delay) {
+                setTimeout(ensureDeleteButton, delay);
+                setTimeout(ensureInlineDeleteButton, delay);
+            });
+        }
+    </script>
+</head>
+<body style="height: 100%; overflow: hidden; margin: 0;">
+    <div id="dvContainer" style="width: 100%; height: 100%;"></div>
+</body>
+</html>

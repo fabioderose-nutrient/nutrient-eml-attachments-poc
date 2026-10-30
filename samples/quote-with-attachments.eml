@@ -1,0 +1,91 @@
+From: Example Supplies Ltd. <orders@example.com>
+To: Sample Retail Group <purchasing@example.com>
+Subject: Quote Q-2026-0142 with attachments
+Date: Mon, 09 Mar 2026 09:30:00 +0000
+Message-ID: <sample-9@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============0880791023070484041=="
+
+--===============0880791023070484041==
+Content-Type: multipart/alternative;
+ boundary="===============4377803326238089315=="
+
+--===============4377803326238089315==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Please find our quote and a few notes attached.
+
+Kind regards,
+Sales Team
+
+--===============4377803326238089315==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+<html>
+<body style='font-family: Arial, sans-serif'>
+<h2 style='color:#1e3a73'>Quote Q-2026-0142</h2>
+<p>Hello,</p>
+<p>Please find our quote and a few notes attached.</p>
+<p>Kind regards,<br>Sales Team</p>
+</body>
+</html>
+
+--===============4377803326238089315==--
+
+--===============0880791023070484041==
+Content-Type: application/pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="quote-Q-2026-0142.pdf"
+MIME-Version: 1.0
+
+JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3Vy
+Y2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAov
+QmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEg
+L1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9u
+dCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9T
+dWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMg
+OCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA3IDAgUiAv
+UmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9J
+bWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdl
+Cj4+CmVuZG9iago1IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNyAwIFIgL1R5
+cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0F1dGhvciAoRXhhbXBsZSBTdXBwbGll
+cyBMdGQuKSAvQ3JlYXRpb25EYXRlIChEOjIwMjYxMDMwMTEzMzUwKzAyJzAwJykgL0NyZWF0b3Ig
+KGFub255bW91cykgL0tleXdvcmRzICgpIC9Nb2REYXRlIChEOjIwMjYxMDMwMTEzMzUwKzAyJzAw
+JykgL1Byb2R1Y2VyIChSZXBvcnRMYWIgUERGIExpYnJhcnkgLSBcKG9wZW5zb3VyY2VcKSkgCiAg
+L1N1YmplY3QgKHVuc3BlY2lmaWVkKSAvVGl0bGUgKFF1b3RlIFEtMjAyNi0wMTQyKSAvVHJhcHBl
+ZCAvRmFsc2UKPj4KZW5kb2JqCjcgMCBvYmoKPDwKL0NvdW50IDEgL0tpZHMgWyA0IDAgUiBdIC9U
+eXBlIC9QYWdlcwo+PgplbmRvYmoKOCAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUg
+L0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCA1NTcKPj4Kc3RyZWFtCkdhdD1nP1llQ00nWkp1JC5GKUYt
+ZWlXaHNvc2g6QyMlYjBbSGc/VCUvJkE4LClxdTdwXCI+NCxpQT11LThPPHJOb2ZJcVVYdVRVUzRS
+R1E+Z3VcPi9ecWczRiVDZFU5ciI4XSFNVytwSyN1Vl0/Ry4hNyM+OWNbW0I7KGtDQEM6Wi8sVjxM
+RHFMSGk4LlVxQ3I/Uk1jUGNSLFVLQTwsI11jQiVoVU9FJi8tYUgyVydIJVcwXEk2LldxaFsxXlMv
+YFRILixRRUpxazRnbnJBXV5vMjdrM2JaM0ZQXkdwQlRTdEZoaT1cRmBlRSc0SDpePllmJjkiTCUi
+Y1RcRUgkMjk/Q3VfcSkzdD5cRSZxSW0uUiV0MEo1dC9SN0phRkU1NUNabURkTUpvM0wuZC4oaWdg
+Q18oMjxMaFIiTCRucDRfUF9MJG1PN2grJ2pgQS9cLiEqcmJePGkhbGtOZl1wVUJcPDYpXSFOUkpX
+R0hMUi5sQzI3VC07ajpPR0ElP11TNFdxTSY5TEYvIWxtR2IrPi8vRmA3LVFTZ3JISzk7PihPdHBi
+N21IRW05TytBdDw3U0ExXW1PLnIrRl1DYWBQbD5ObUYrLmtGcFFscCFjPjJqSDFFRUhORUddakhI
+KVFWKilRUyRHQCRobkBDbDxdVEBQbGlEJGJbV0xNK3VhQmo4NDtsWDZIPmU5aFVnLzs5az1abksw
+XyZIMUtdJDA7ZXBnY2BtNkpNbiY7LX4+ZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgOQowMDAwMDAw
+MDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEwMiAwMDAwMCBuIAowMDAw
+MDAwMjA5IDAwMDAwIG4gCjAwMDAwMDAzMjEgMDAwMDAgbiAKMDAwMDAwMDUyNCAwMDAwMCBuIAow
+MDAwMDAwNTkyIDAwMDAwIG4gCjAwMDAwMDA4NzQgMDAwMDAgbiAKMDAwMDAwMDkzMyAwMDAwMCBu
+IAp0cmFpbGVyCjw8Ci9JRCAKWzxlNmVhYWZiNDIwMjgxYWYyMTdjY2U3YWY5NWMwNWFkMj48ZTZl
+YWFmYjQyMDI4MWFmMjE3Y2NlN2FmOTVjMDVhZDI+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERG
+IGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDYgMCBSCi9Sb290IDUgMCBS
+Ci9TaXplIDkKPj4Kc3RhcnR4cmVmCjE1ODAKJSVFT0YK
+
+--===============0880791023070484041==
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="quote-notes.txt"
+MIME-Version: 1.0
+
+Tm90ZXMgZm9yIHRoZSBxdW90ZSBRLTIwMjYtMDE0MgotIFByaWNlcyBpbmNsdWRlIGRlbGl2ZXJ5
+IHRvIHRoZSBmb3VyIHNpdGVzLgotIFBheW1lbnQgdGVybXM6IDMwIGRheXMuCg==
+
+--===============0880791023070484041==--
